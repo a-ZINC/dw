@@ -1,0 +1,59 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0},
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": { "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"}
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug (plain: gdb + Valgrind)",
+            "inherits": "base",
+            "cacheVariables": { 
+                "CMAKE_BUILD_TYPE": "Debug",
+                "_comment": "Default Debug uses -g -O0 for maximum debugability with gdb/Valgrind"
+        }
+        },
+        {
+            "name": "asan",
+            "displayName": "Debug + ASan/LSan/UBSan",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug", 
+                "DW_SANITIZE": "ON",
+                "_comment": "Adds -fsanitize=address,undefined -fno-omit-frame-pointer"
+            }
+        },
+        {
+            "name": "rel",
+            "displayName": "RelWithDebInfo",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "_comment": "Typically uses -O2 -g; override with -g0 via CMAKE_CXX_FLAGS_RELWITHDEBINFO if you want zero debug overhead for pure speed benchmarks"
+            }
+        },
+        {
+            "name": "asan-rel",
+            "displayName": "RelWithDebInfo + ASan/UBSan (benchmarks)",
+            "inherits": "base",
+            "cacheVariables": { 
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo", 
+                "DW_SANITIZE": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        { "name": "debug",    "configurePreset": "debug" },
+        { "name": "asan",     "configurePreset": "asan" },
+        { "name": "rel",      "configurePreset": "rel" },
+        { "name": "asan-rel", "configurePreset": "asan-rel" }
+    ],
+    "testPresets": [
+        { "name": "debug", "configurePreset": "debug", "output": { "outputOnFailure": true } },
+        { "name": "asan",  "configurePreset": "asan",  "output": { "outputOnFailure": true } }
+    ]
+}

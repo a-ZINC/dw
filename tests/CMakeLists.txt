@@ -1,3 +1,3 @@
-# add_executable(fd_test fd_test.cpp)
-# target_link_libraries(fd_test PRIVATE dw_options)
-# add_test(NAME fd_test COMMAND fd_test)
+add_executable(proc_self_test proc_self_test.cpp)
+target_link_libraries(proc_self_test PRIVATE dw_core)
+add_test(NAME proc_self_test COMMAND proc_self_test)

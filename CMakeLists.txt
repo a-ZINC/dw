@@ -19,6 +19,8 @@ add_library(dw_options INTERFACE)
 target_include_directories(dw_options INTERFACE ${PROJECT_SOURCE_DIR}/include)
 target_compile_options(dw_options INTERFACE -Wall -Wextra -Wpedantic -Wshadow)
 
+add_subdirectory(src)
+
 if(DW_ERROR)
     target_compile_options(dw_options INTERFACE -Werror)
 endif()
@@ -35,5 +37,6 @@ if(DW_BUILD_LAB)
 endif()
 
 if(DW_BUILD_TESTS)
+    enable_testing()
     add_subdirectory(tests)
 endif()

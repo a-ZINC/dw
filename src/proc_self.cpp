@@ -3,6 +3,7 @@
 
 #include <cerrno>
 #include <charconv>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <fcntl.h>
@@ -89,12 +90,53 @@ namespace dw {
     }
 
     bool read_map_snapshot(std::vector<MapEntry>& map_entries) {
-        Fd fd(open("/proc/self/maps", O_RDONLY | O_CLOEXEC));
-        if (!fd.valid()) {
+        map_entries = {};
+        std::string output;
+        if (!read_file("/proc/self/maps",output)) {
             return false;
         }
 
-        
+        std::string_view map_snapshot_view{output};
+        while(!map_snapshot_view.empty()) {
+            size_t n = map_snapshot_view.find("\n");
+            std::string_view line = map_snapshot_view.substr(0, n);
+            map_snapshot_view = (n == std::string_view::npos) ? std::string_view{} : map_snapshot_view.substr(n+1);
+
+            std::uint64_t start;
+            std::uint64_t end;
+            std::uint64_t offset;
+            std::uint64_t inode;
+            char perm[8];
+            char dev[32];
+            int consumed = -1;
+            int fields = std::sscanf(line.data(), "%lx-%lx %7s %lx %31s %lx %n", &start, &end, perm, &offset, dev, &inode, &consumed);
+            if (fields < 6) return false;
+
+            MapEntry e;
+            e.start = start;
+            e.end = end;
+            e.offset = offset;
+            e.inode = inode;
+            e.permission = perm;
+
+            if (consumed >= 0 && static_cast<size_t>(consumed) < line.size()) {
+                e.path = line.substr(static_cast<size_t>(consumed));
+            }
+
+            map_entries.push_back(e);
+        }
+
+        return true;
+    }
+
+    const MapEntry* find_entry(std::vector<MapEntry>& mapEntry, void* addr) {
+        std::uint64_t address = reinterpret_cast<int64_t>(addr);
+        for (auto& m : mapEntry) {
+            if (address >= m.start && address <= m.end) {
+                return &m;
+            }
+        }
+        return nullptr;
     }
 
 

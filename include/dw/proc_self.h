@@ -23,17 +23,19 @@ namespace dw {
     bool read_mem_snapshot(MemSnapshot& mem_snapshot);
 
     struct MapEntry {
-        std::int64_t start = 0;
-        std::int64_t end = 0;
+        std::uint64_t start = 0;
+        std::uint64_t end = 0;
         std::string permission;
-        std::int64_t offset = 0;
-        std::int64_t inode = 0;
+        std::uint64_t offset = 0;
+        std::uint64_t inode = 0;
         std::string path;
 
-        std::int64_t size_kb(std::int64_t start, int64_t end) {
-            return (end -  start) / 1024;
+        std::uint64_t size_kb(std::int64_t start_, int64_t end_) {
+            return (end_ -  start_) / 1024;
         }
     };
 
     bool read_map_snapshot(std::vector<MapEntry>& map_entries); 
+
+    const MapEntry* find_entry(std::vector<MapEntry>& mapEntry, void* addr);
 }

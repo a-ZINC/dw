@@ -82,7 +82,7 @@ namespace dw {
         }
 
         rusage ru{};
-        if (getrusage(RUSAGE_SELF, &ru)) {
+        if (!getrusage(RUSAGE_SELF, &ru)) {
             mem_snapshot.minor_faults = ru.ru_minflt;
             mem_snapshot.major_faults = ru.ru_majflt;
         }

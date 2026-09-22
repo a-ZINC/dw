@@ -3,11 +3,16 @@ function(dw_lab name)
     target_link_libraries(${name} PRIVATE dw_options)
 endfunction()
 
+function (dw_lab_core name)
+    add_executable(${name} ${name}.cpp)
+    target_link_libraries(${name} PRIVATE dw_core)
+endfunction()
+
 dw_lab(hello)
 dw_lab(leak_bounded)
 dw_lab(bugs)
 dw_lab(fd_leak)
 dw_lab(fd_raii)
 dw_lab(observe_pid)
-# dw_lab(bench)
+dw_lab_core(touch_pages)
 

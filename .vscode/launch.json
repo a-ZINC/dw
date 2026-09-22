@@ -5,7 +5,7 @@
             "name": "Debug with GDB",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug/tests/proc_self_test",
+            "program": "${workspaceFolder}/build/debug/lab/touch_pages",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

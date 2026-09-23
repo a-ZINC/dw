@@ -15,4 +15,4 @@ dw_lab(fd_leak)
 dw_lab(fd_raii)
 dw_lab(observe_pid)
 dw_lab_core(touch_pages)
-
+dw_lab_core(maps_summary)

@@ -8,6 +8,10 @@ namespace dw {
         Fd() noexcept = default;
         Fd(int fd) noexcept : fd_(fd) {}
 
+        ~Fd() {
+            reset(fd_);
+        }
+
         Fd(const Fd&) = delete;
         Fd& operator=(const Fd&) = delete;
 

@@ -20,6 +20,7 @@ target_include_directories(dw_options INTERFACE ${PROJECT_SOURCE_DIR}/include)
 target_compile_options(dw_options INTERFACE -Wall -Wextra -Wpedantic -Wshadow)
 
 add_subdirectory(src)
+add_subdirectory(bench)
 
 if(DW_ERROR)
     target_compile_options(dw_options INTERFACE -Werror)

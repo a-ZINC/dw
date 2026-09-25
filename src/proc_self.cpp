@@ -11,25 +11,28 @@
 #include <string>
 #include <system_error>
 #include <sys/resource.h>
+#include <cstring>
 
 namespace dw {
-    bool read_file(const char *path, std::string &output) {
-        output.clear();
+    dw::Result<std::string> read_file(const char *path) {
         Fd fd(open(path, O_RDONLY | O_CLOEXEC));
         if (!fd.valid()) {
-            perror("open!");
-            return false;
+            int saved_errno = errno;
+            return dw::Result<std::string>::failure(errno, std::string("open failed: ") + path + ": " + std::strerror(saved_errno));
         }
 
+        std::string output;
         char buffer[4096];
         while(true) {
             size_t n = read(fd.get(), &buffer, sizeof(buffer));
             if (n) {
                 output.append(buffer, static_cast<int>(n));
             } else if (n == 0) {
-                return true;
+                return dw::Result<std::string>::success(std::move(output));
             } else if (errno != EINTR) {
-                return false;
+                const int saved_errno = errno;
+                return Result<std::string>::failure(
+                    saved_errno, std::string("read failed: ") + path + ": " + std::strerror(saved_errno));
             }
         }
     }
@@ -47,12 +50,13 @@ namespace dw {
     bool read_mem_snapshot(MemSnapshot& mem_snapshot) {
         mem_snapshot = {};
 
-        std::string mem_snapshot_buffer;
-        if (!read_file("/proc/self/status", mem_snapshot_buffer)) {
+        dw::Result<std::string> mem_snapshot_result = read_file("/proc/self/status");
+        if (!mem_snapshot_result.ok()) {
+            std::fprintf(stderr, "%s\n", dw::to_char(mem_snapshot_result.error()));
             return false;
         }
 
-        std::string_view mem_snapshot_view{mem_snapshot_buffer};
+        std::string_view mem_snapshot_view{mem_snapshot_result.value()};
         while(!mem_snapshot_view.empty()) {
             size_t n = mem_snapshot_view.find("\n");
             std::string_view line = mem_snapshot_view.substr(0, n);
@@ -91,12 +95,13 @@ namespace dw {
 
     bool read_map_snapshot(std::vector<MapEntry>& map_entries) {
         map_entries = {};
-        std::string output;
-        if (!read_file("/proc/self/maps",output)) {
+        dw::Result<std::string> output_result = read_file("/proc/self/maps");
+        if (!output_result.ok()) {
+            std::fprintf(stderr, "%s\n", dw::to_char(output_result.error()));
             return false;
         }
 
-        std::string_view map_snapshot_view{output};
+        std::string_view map_snapshot_view{output_result.value()};
         while(!map_snapshot_view.empty()) {
             size_t n = map_snapshot_view.find("\n");
             std::string_view line = map_snapshot_view.substr(0, n);

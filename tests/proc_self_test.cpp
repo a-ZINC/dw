@@ -24,12 +24,12 @@
     } while(0)   
 
 int main() {
-    {
-        std::string output;
-        CHECK(dw::read_file("/proc/self/status", output));
-        CHECK(output.size() > 0);
-        CHECK(output.find("VmRSS") != std::string::npos);
-        CHECK(!dw::read_file("/proc/this/does/not/exist", output));
+    {   
+        dw::Result<std::string> output_result = dw::read_file("/proc/self/status");
+        CHECK(output_result.ok());
+        CHECK(output_result.value().size() > 0);
+        CHECK(output_result.value().find("VmRSS") != std::string::npos);
+        CHECK(!dw::read_file("/proc/this/does/not/exist"));
     }
 
     {

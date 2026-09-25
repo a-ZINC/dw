@@ -4,9 +4,10 @@
 #include <cstdint>
 #include<string>
 #include <vector>
+#include "result.h"
 
 namespace dw {
-    bool read_file(const char* path, std::string& output);
+    dw::Result<std::string> read_file(const char* path);
 
     struct MemSnapshot {
         std::int64_t vm_size_kb = -1;

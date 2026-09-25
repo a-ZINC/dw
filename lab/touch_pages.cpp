@@ -30,9 +30,9 @@ int main(int argc, char** argv) {
     std::size_t size = static_cast<size_t>(size_mb * 1024 * 1024);
     size_t page = static_cast<size_t>(sysconf(_SC_PAGESIZE));
 
-    std::string thp;
-    if(dw::read_file("/sys/kernel/mm/transparent_hugepage/enabled", thp)) {
-        std::fprintf(stdin, "huge table enabled?: %s\n", thp.c_str());
+    dw::Result<std::string> thp_result = dw::read_file("/sys/kernel/mm/transparent_hugepage/enabled");
+    if(thp_result.ok()) {
+        std::fprintf(stdin, "huge table enabled?: %s\n", thp_result.value().c_str());
     }
     std::printf("page size: %zu bytes, region: %ld MB = %zu pages\n\n", page, size_mb, size / page);
     std::printf("%-30s %10s %10s %10s %10s %12s\n", "step", "VmSize kB", "VmRSS kB", "RssAnon kB",

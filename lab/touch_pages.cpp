@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include "../include/dw/proc_self.h"
+#include "../include/dw/log.h"
 
 void row(std::string label, const dw::MemSnapshot& mem, dw::MemSnapshot& base) {
     std::printf("%-31s %10ld %10ld %10ld %10ld %12ld\n", label.c_str(), mem.vm_size_kb, mem.vm_rss_kb, mem.rss_anon_kb, mem.vm_hwm_kb, mem.minor_faults - base.minor_faults);
@@ -26,6 +27,7 @@ int main(int argc, char** argv) {
         std::fprintf(stderr, "usage: %s [megabytes>=4]\n", argv[0]);
         return 2;
     }
+    DW_LOG_DEBUG("a debug message, arg=%d", 7);
 
     std::size_t size = static_cast<size_t>(size_mb * 1024 * 1024);
     size_t page = static_cast<size_t>(sysconf(_SC_PAGESIZE));
